@@ -1,0 +1,48 @@
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+
+@Component({
+  selector: 'app-registration',
+  templateUrl: './registration.component.html',
+  styleUrls: ['./registration.component.css']
+})
+export class RegistrationComponent implements OnInit {
+
+  mensagem: String = '';
+
+  constructor(
+    private httpClient: HttpClient
+  ) { }
+
+  formRegistration = new FormGroup({
+    nome: new FormControl('', [Validators.required]),
+    email: new FormControl('', [Validators.required]),
+    senha: new FormControl('', [Validators.required]),
+    senhaConfirmacao: new FormControl('', [Validators.required])
+  });
+
+  get form(): any {
+    return this.formRegistration.controls;
+  }
+
+  ngOnInit(): void {
+  }
+
+  onSubmit(): void {
+    this.httpClient.post(
+      environment.apiLoginUrl + "api/registration",
+      this.formRegistration.value,
+      { responseType: 'text' })
+      .subscribe({
+        next: (result) => {
+          this.mensagem = result;
+          this.formRegistration.reset();
+        },
+        error: (e) => {
+          this.mensagem = e.error;
+        }
+      })
+  }
+}
